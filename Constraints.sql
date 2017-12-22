@@ -18,7 +18,6 @@ ADD CONSTRAINT FK_Recipients_UsersLocalId FOREIGN KEY (localId)
 ;
 GO
 
-
 /* Senders constraints */
 ALTER TABLE [dbo].[Senders]
 ADD CONSTRAINT FK_Senders_TransactionsTransactionId FOREIGN KEY (transactionId)
@@ -36,10 +35,18 @@ ADD CONSTRAINT FK_Senders_UsersLocalId FOREIGN KEY (localId)
 ;
 GO
 
-/* BanList constraints */
-ALTER TABLE [dbo].[BanList]
-ADD CONSTRAINT FK_BanList_UsersLoaclId FOREIGN KEY (localId)
+/* UserRestrictions constraints */
+ALTER TABLE [dbo].[UserRestrictions]
+ADD CONSTRAINT FK_UserRestrictions_UsersLocalId FOREIGN KEY (localId)
 	REFERENCES [dbo].[Users] (localId)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+;
+GO
+
+ALTER TABLE [dbo].[UserRestrictions]
+ADD CONSTRAINT FK_UserRestrictions_RestrictionsRestrictionId FOREIGN KEY (restrictionId)
+	REFERENCES [dbo].[Restrictions] (restrictionId)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 ;

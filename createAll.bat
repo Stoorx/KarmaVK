@@ -1,0 +1,1 @@
+sqlcmd -Stcp:URANIUM\SQLEXPRESS -E -icreateAllScript.sql

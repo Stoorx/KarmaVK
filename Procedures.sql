@@ -1,7 +1,7 @@
 USE [KarmaBotVK]
 GO
 
-/* Write transaction to journal and make connections*/
+/* Write transaction to journal */
 CREATE PROCEDURE [dbo].[WriteTransaction]
 	@senderId int = 0,
 	@recipientId int = 0,
@@ -25,13 +25,11 @@ BEGIN
 		INSERT INTO [dbo].[Recipients] (localId, transactionId) VALUES (@recipientId, @currentTransaction)
 	END
 	ELSE
-	BEGIN
 		RAISERROR (N'Sender and Recipient are not in the same chat', 11, 1)
-	END
-	
 END
 GO
 
+/* Registers new user */
 CREATE PROCEDURE [dbo].[RegisterUser]
 	@chatId int = 0,
 	@userVkId int = 0
@@ -78,7 +76,7 @@ BEGIN
 	IF @RecipientLocalId IS NULL
 	BEGIN
 		EXEC [dbo].[RegisterUser] @chatId, @recipientVkId
-		SET @RecipientLocalId = (SELECT [localId] FROM [dbo].[Users] WHERE [chatId] = @chatId AND [vkId] = @recipientLocalId)
+		SET @RecipientLocalId = (SELECT [localId] FROM [dbo].[Users] WHERE [chatId] = @chatId AND [vkId] = @recipientVkId)
 	END
 
 	/* Transfer karma */

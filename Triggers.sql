@@ -3,7 +3,7 @@ GO
 
 /* This trigger unban unbannable admin automatically */
 CREATE TRIGGER [dbo].[autoUnbannable]
-	ON [dbo].[BanList]
+	ON [dbo].[UserRestrictions]
 	AFTER INSERT
 AS
 BEGIN
@@ -20,7 +20,7 @@ BEGIN
 			INNER JOIN [dbo].[AdminRights] ON [Admins].[rightId] = [AdminRights].[rightId]
 			WHERE [localId] = @currentId AND [rightName] = N'Unbannable')
 		BEGIN
-			DELETE FROM [dbo].[BanList] WHERE [localId] = @currentId
+			DELETE FROM [dbo].[UserRestrictions] WHERE [localId] = @currentId
 		END
 		FETCH NEXT FROM unbanCursor INTO @currentId
 	END
@@ -28,7 +28,6 @@ BEGIN
 	DEALLOCATE unbanCursor
 END
 GO
-
 
 /* Makes a timestamp on admin's rights */
 CREATE TRIGGER [dbo].[gotRightsTS]
@@ -43,17 +42,21 @@ BEGIN
 END
 GO
 
-/* Makes a timestamp on admin's rights */
-CREATE TRIGGER [dbo].[userClearDelete]
-	ON [dbo].[Users]
+/* Clear deleted user transactions */
+CREATE TRIGGER [dbo].[clearSendersTransacions]
+	ON [dbo].[Senders]
 	AFTER DELETE
 AS
 BEGIN
-	DELETE FROM [dbo].[Transactions] 
-		WHERE [transactionId] =	
-			(SELECT [transactionId] FROM [dbo].[Senders] WHERE [localId] = (SELECT [localId] FROM deleted))
-	DELETE FROM [dbo].[Transactions] 
-		WHERE [transactionId] =	
-			(SELECT [transactionId] FROM [dbo].[Recipients] WHERE [localId] = (SELECT [localId] FROM deleted))
+	DELETE FROM [dbo].[Transactions] WHERE [transactionId] = ANY (SELECT [transactionId] FROM deleted)
+END
+GO
+
+CREATE TRIGGER [dbo].[clearRecipientsTransacions]
+	ON [dbo].[Recipients]
+	AFTER DELETE
+AS
+BEGIN
+	DELETE FROM [dbo].[Transactions] WHERE [transactionId] = ANY (SELECT [transactionId] FROM deleted)
 END
 GO
